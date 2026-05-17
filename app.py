@@ -25,7 +25,12 @@ if not st.session_state["authenticated"]:
     if st.button("Verify Identity Credentials"):
         if email.strip().lower().endswith("@bhp.com") and passcode == "BHP_Innovation_2026!":
             st.session_state["authenticated"] = True
-            st.rerun()
+            
+            # --- CRASH-PROOF RERUN FALLBACK ---
+            try:
+                st.rerun()
+            except AttributeError:
+                st.experimental_rerun()
         else:
             st.error("Authentication Fault: Invalid domain signature or access key.")
     st.stop()
@@ -74,24 +79,37 @@ if query:
             try:
                 results = db.similarity_search(query, k=4)
                 
-                st.markdown(f"### Target Match Vector Array Output")
-                for idx, doc in enumerate(results):
-                    with st.expander(f"Reference Match Record #{idx+1}", expanded=True):
-                        st.write(doc.page_content)
+                if not results:
+                    st.info("No matching vendor nodes found for this query pattern.")
+                else:
+                    st.markdown(f"### Target Match Vector Array Output")
+                    for idx, item in enumerate(results):
                         
-                        # --- SMART DOCUMENT LINKING SYSTEM ---
-                        if hasattr(doc, 'metadata') and doc.metadata:
-                            st.caption(f"**Source Origin Metadata:** {doc.metadata}")
+                        # --- UNPACKING GUARD SYSTEM ---
+                        if isinstance(item, tuple):
+                            doc = item[0]
+                        else:
+                            doc = item
+                        
+                        with st.expander(f"Reference Match Record #{idx+1}", expanded=True):
+                            if hasattr(doc, 'page_content'):
+                                st.write(doc.page_content)
+                            else:
+                                st.write(str(doc))
                             
-                            source_path = doc.metadata.get("source", "")
-                            file_name = os.path.basename(source_path) if source_path else ""
-                            
-                            if file_name:
-                                onedrive_base = "https://mysite.bhpbilliton.com.mcas.ms/my?id=%2Fpersonal%2Fmariafrancesca%5Fpabelico%5Fbhp%5Fcom%2FDocuments%2FVendorDocs"
-                                safe_file_name = file_name.replace(" ", "%20")
-                                full_download_url = f"{onedrive_base}%2F{safe_file_name}&ga=1"
+                            # --- SMART DOCUMENT LINKING SYSTEM ---
+                            if hasattr(doc, 'metadata') and doc.metadata:
+                                st.caption(f"**Source Origin Metadata:** {doc.metadata}")
                                 
-                                st.markdown(f"🔗 [Open Original Document ({file_name})]({full_download_url})")
+                                source_path = doc.metadata.get("source", "")
+                                file_name = os.path.basename(source_path) if source_path else ""
+                                
+                                if file_name:
+                                    onedrive_base = "https://mysite.bhpbilliton.com.mcas.ms/my?id=%2Fpersonal%2Fmariafrancesca%5Fpabelico%5Fbhp%5Fcom%2FDocuments%2FVendorDocs"
+                                    safe_file_name = file_name.replace(" ", "%20")
+                                    full_download_url = f"{onedrive_base}%2F{safe_file_name}&ga=1"
+                                    
+                                    st.markdown(f"🔗 [Open Original Document ({file_name})]({full_download_url})")
             except Exception as search_error:
                 st.error(f"Search Execution Error: {str(search_error)}")
     else:
