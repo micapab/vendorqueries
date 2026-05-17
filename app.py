@@ -71,7 +71,26 @@ if query:
             for idx, doc in enumerate(results):
                 with st.expander(f"Reference Match Record #{idx+1}", expanded=True):
                     st.write(doc.page_content)
+                    
+                    # --- SMART DOCUMENT LINKING SYSTEM ---
                     if doc.metadata:
                         st.caption(f"**Source Origin Metadata:** {doc.metadata}")
+                        
+                        # Extract the original filename path from your database metadata
+                        source_path = doc.metadata.get("source", "")
+                        file_name = os.path.basename(source_path) if source_path else ""
+                        
+                        if file_name:
+                            # Secure Corporate OneDrive folder path wrapper
+                            onedrive_base = "https://mysite.bhpbilliton.com.mcas.ms/my?id=%2Fpersonal%2Fmariafrancesca%5Fpabelico%5Fbhp%5Fcom%2FDocuments%2FVendorDocs"
+                            
+                            # Clean spaces for standard URL web encoding
+                            safe_file_name = file_name.replace(" ", "%20")
+                            
+                            # Constructing the exact link to target the file inside that folder
+                            full_download_url = f"{onedrive_base}%2F{safe_file_name}&ga=1"
+                            
+                            # Renders a neat link right beneath the text block
+                            st.markdown(f"🔗 [Open Original Document ({file_name})]({full_download_url})")
     else:
         st.error("Operation Aborted: Connection to the underlying database collection is offline.")
