@@ -1,7 +1,0 @@
-AttributeError: This app has encountered an error. The original error message is redacted to prevent data leaks. Full error details have been recorded in the logs (if you're on Streamlit Cloud, click on 'Manage app' in the lower right of your app).
-Traceback:
-File "/home/adminuser/venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 565, in _run_script
-    exec(code, module.__dict__)
-File "/mount/src/vendorqueries/app.py", line 27, in <module>
-    st.rerun()
-    ^^^^^^^^
