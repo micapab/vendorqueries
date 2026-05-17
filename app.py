@@ -10,16 +10,6 @@ from langchain_huggingface import HuggingFaceEmbeddings
 # --- PAGE SETUP ---
 st.set_page_config(page_title="BHP Vendor Intelligence Portal", page_icon="🔍", layout="wide")
 
-# Custom BHP Corporate Styling
-st.markdown("""
-    <style>
-    .stApp { background-color: #FFFFFF; }
-    h1 { color: #E05206; font-family: 'Arial Black', sans-serif; }
-    .stButton>button { background-color: #E05206; color: white; border-radius: 4px; }
-    .stButton>button:hover { background-color: #BA4203; color: white; }
-    </style>
-""", unsafe_allowed_html=True)
-
 # --- SECURE CREDENTIAL SYSTEM ---
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
